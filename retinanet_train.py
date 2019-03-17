@@ -1,18 +1,4 @@
-train_csv = '/content/gdrive/My Drive/Colab Notebooks/Pytorch/data/seedling_test/data/training/training_annotations.csv'  # @param {type:"string"}
-val_csv = '/content/gdrive/My Drive/Colab Notebooks/Pytorch/data/seedling_test/data/training/validation_annotations.csv'  # @param {type:"string"}
-classes_csv = '/content/gdrive/My Drive/Colab Notebooks/Pytorch/data/seedling_test/data/label_map.csv'  # @param {type:"string"}
-output_prefix = 'seedlings'
-out_dir = '/content/gdrive/My Drive/Colab Notebooks/Pytorch/data/seedling_test/checkpoints/'
-
-model_fname = None  # '/content/gdrive/My Drive/Colab Notebooks/Pytorch/data/wyn_trees/trees_state_2998.pt'
-
-# @markdown ### Parameters
-
-epochs = 2000  # @param {type:"integer"}
-resnet_depth = 18  # @param [18, 34, 50, 101, 152]
-use_gpu = True  # @param {type:"boolean"}
-
-# @markdown ---
+use_gpu = True
 
 
 import time
@@ -45,18 +31,16 @@ assert torch.__version__.split('.')[1] == '4'
 
 print('CUDA available: {}'.format(torch.cuda.is_available()))
 
-def train(train_csv,val_csv,classes_csv,depth=50,epochs=1000,steps=100,out_dir ='',out_prefix=''):
+def train(train_csv,val_csv,classes_csv,img_dir,depth=50,epochs=1000,steps=100,out_dir ='',out_prefix=''):
 
     if not os.path.exists(out_dir):
         os.makedirs(out_dir)
 
     # Create the data loaders
 
-    dataset_train = CSVDataset(train_file=train_csv, class_list=classes_csv,
-                               transform=transforms.Compose([Normalizer(), Augmenter(), Resizer()]))
+    dataset_train = CSVDataset(train_file=train_csv, class_list=classes_csv, dir = img_dir,transform=transforms.Compose([Normalizer(), Augmenter(), Resizer()]))
 
-    dataset_val = CSVDataset(train_file=val_csv, class_list=classes_csv,
-                             transform=transforms.Compose([Normalizer(), Resizer()]))
+    dataset_val = CSVDataset(train_file=val_csv, class_list=classes_csv,dir=img_dir,transform=transforms.Compose([Normalizer(), Resizer()]))
 
     sampler = AspectRatioBasedSampler(dataset_train, batch_size=2, drop_last=False)
     dataloader_train = DataLoader(dataset_train, num_workers=3, collate_fn=collater, batch_sampler=sampler)
