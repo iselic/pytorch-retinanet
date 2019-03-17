@@ -126,7 +126,7 @@ class CocoDataset(Dataset):
 class CSVDataset(Dataset):
     """CSV dataset."""
 
-    def __init__(self, train_file, class_list, transform=None):
+    def __init__(self, train_file, class_list, dir,transform=None):
         """
         Args:
             train_file (string): CSV file with training annotations
@@ -136,6 +136,7 @@ class CSVDataset(Dataset):
         self.train_file = train_file
         self.class_list = class_list
         self.transform = transform
+        self.dir = dir
 
         # parse the provided class file
         try:
@@ -151,7 +152,7 @@ class CSVDataset(Dataset):
         # csv with img_path, x1, y1, x2, y2, class_name
         try:
             with self._open_for_csv(self.train_file) as file:
-                self.image_data = self._read_annotations(csv.reader(file, delimiter=','), self.classes)
+                self.image_data = self._read_annotations(csv.reader(file, delimiter=','), self.classes,self.dir)
         except ValueError as e:
             raise_from(ValueError('invalid CSV annotations file: {}: {}'.format(self.train_file, e)), None)
         self.image_names = list(self.image_data.keys())
@@ -251,7 +252,7 @@ class CSVDataset(Dataset):
 
         return annotations
 
-    def _read_annotations(self, csv_reader, classes):
+    def _read_annotations(self, csv_reader, classes,dir):
         result = {}
         for line, row in enumerate(csv_reader):
             line += 1
@@ -260,6 +261,8 @@ class CSVDataset(Dataset):
                 img_file, x1, y1, x2, y2, class_name = row[:6]
             except ValueError:
                 raise_from(ValueError('line {}: format should be \'img_file,x1,y1,x2,y2,class_name\' or \'img_file,,,,,\''.format(line)), None)
+
+            img_file = dir+img_file
 
             if img_file not in result:
                 result[img_file] = []
