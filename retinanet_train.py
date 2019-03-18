@@ -31,7 +31,7 @@ assert torch.__version__.split('.')[1] == '4'
 
 print('CUDA available: {}'.format(torch.cuda.is_available()))
 
-def train(train_csv,val_csv,classes_csv,img_dir,depth=50,epochs=1000,steps=100,out_dir ='',out_prefix=''):
+def train(train_csv,val_csv,classes_csv,img_dir,resnet_depth=50,epochs=1000,steps=100,out_dir ='',out_prefix=''):
 
     if not os.path.exists(out_dir):
         os.makedirs(out_dir)
@@ -50,6 +50,7 @@ def train(train_csv,val_csv,classes_csv,img_dir,depth=50,epochs=1000,steps=100,o
         dataloader_val = DataLoader(dataset_val, num_workers=3, collate_fn=collater, batch_sampler=sampler_val)
 
     # Create the model
+
     if resnet_depth == 18:
         retinanet = model.resnet18(num_classes=dataset_train.num_classes(), pretrained=True)
     elif resnet_depth == 34:
