@@ -136,11 +136,11 @@ def train(train_csv,val_csv,classes_csv,img_dir,model_fname=None,resnet_depth=50
         scheduler.step(np.mean(epoch_loss))
 
         if (epoch_num) % steps == 0:
-            torch.save(retinanet.module, '{}{}_model_{}.pt'.format(out_dir, output_prefix, epoch_num))
-            torch.save(retinanet.state_dict(), '{}{}_state_{}.pt'.format(out_dir, output_prefix, epoch_num))
+            torch.save(retinanet.module, '{}{}_model_{}.pt'.format(out_dir, out_prefix, epoch_num))
+            torch.save(retinanet.state_dict(), '{}{}_state_{}.pt'.format(out_dir, out_prefix, epoch_num))
 
-    torch.save(retinanet, out_dir + 'model_final.pt'.format(epoch_num))
-    torch.save(retinanet.state_dict(), out_dir + 'state_final_.pt'.format(epoch_num))
+    torch.save(retinanet, out_dir + '{}model_final.pt'.format(out_prefix))
+    torch.save(retinanet.state_dict(), out_dir + '{}state_final_.pt'.format(out_prefix))
 
 if __name__ == '__main__':
 	train()
