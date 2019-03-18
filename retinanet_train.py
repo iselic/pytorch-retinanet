@@ -31,7 +31,7 @@ assert torch.__version__.split('.')[1] == '4'
 
 print('CUDA available: {}'.format(torch.cuda.is_available()))
 
-def train(train_csv,val_csv,classes_csv,img_dir,resnet_depth=50,epochs=1000,steps=100,out_dir ='',out_prefix=''):
+def train(train_csv,val_csv,classes_csv,img_dir,model_fname=None,resnet_depth=50,epochs=1000,steps=100,out_dir ='',out_prefix=''):
 
     if not os.path.exists(out_dir):
         os.makedirs(out_dir)
