@@ -125,9 +125,9 @@ def train(train_csv,val_csv,classes_csv,img_dir,model_fname=None,resnet_depth=50
     torch.save(retinanet.state_dict(), out_dir + '{}state_final_.pt'.format(out_prefix))
 
 
-def infer(val_csv,classes_csv,model_fname,resnet_depth,out_dir, results_fname):
-
-    dataset_val = CSVDataset(train_file=val_csv, class_list=classes_csv,transform=transforms.Compose([Normalizer(), Resizer()]))
+def infer(img_csv,classes_csv,img_dir,model_fname,resnet_depth,out_dir, results_fname):
+    # Create dataset
+    dataset_val = CSVDataset(train_file=img_csv, class_list=classes_csv,dir = img_dir, transform=transforms.Compose([Normalizer(), Resizer()]))
 
     sampler_val = AspectRatioBasedSampler(dataset_val, batch_size=1, drop_last=False)
     dataloader_val = DataLoader(dataset_val, num_workers=1, collate_fn=collater, batch_sampler=sampler_val)
@@ -207,3 +207,4 @@ def infer(val_csv,classes_csv,model_fname,resnet_depth,out_dir, results_fname):
 
     with open(out_dir+results_fname,"wb") as output_file:
         pickle.dump(results, output_file)
+
