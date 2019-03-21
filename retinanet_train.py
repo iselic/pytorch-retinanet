@@ -125,7 +125,7 @@ def train(train_csv,val_csv,classes_csv,img_dir,model_fname=None,resnet_depth=50
     torch.save(retinanet.state_dict(), out_dir + '{}state_final_.pt'.format(out_prefix))
 
 
-def infer(img_csv,classes_csv,img_dir,model_fname,resnet_depth,score_thresh=0.01,out_dir, results_fname):
+def infer(img_csv,classes_csv,img_dir,model_fname,resnet_depth,score_thresh,out_dir, results_fname):
     # Create dataset
     dataset_val = CSVDataset(train_file=img_csv, class_list=classes_csv,img_dir = img_dir, transform=transforms.Compose([Normalizer(), Resizer()]))
 
