@@ -304,20 +304,19 @@ class CSVDataset(Dataset):
         return float(image.width) / float(image.height)
 
 class CustomDataset(Dataset):
-    """CSV dataset."""
 
-    def __init__(self, train_file, class_list,img_dir, transform=None):
+  """Img folder with .json for each img"""
+
+    def __init__(self, img_list,class_list, transform=None):
         """
         Args:
             train_file (string): CSV file with training annotations
             annotations (string): CSV file with class list
             test_file (string, optional): CSV file with testing annotations
         """
-        self.train_file = train_file
         self.class_list = class_list
         self.transform = transform
         self.img_dir = img_dir
-
 
         # parse the provided class file
         try:
@@ -330,10 +329,14 @@ class CustomDataset(Dataset):
         for key, value in self.classes.items():
             self.labels[value] = key
 
-        # csv with img_path, x1, y1, x2, y2, class_name
+        # Get all image fnames in folder
+        img_list = []
+        for file in os.listdir(self.img_dir):
+            if file.endswith(".png"):
+                img_list.append(file)
+
         try:
-            with self._open_for_csv(self.train_file) as file:
-                self.image_data = self._read_annotations(csv.reader(file, delimiter=','), self.classes)
+            self.image_data = self._read_annotations(img_list, self.classes)
         except ValueError as e:
             raise_from(ValueError('invalid CSV annotations file: {}: {}'.format(self.train_file, e)), None)
         self.image_names = list(self.image_data.keys())
@@ -433,41 +436,47 @@ class CustomDataset(Dataset):
 
         return annotations
 
-    def _read_annotations(self, csv_reader, classes):
+    def _read_annotations(self, img_list, classes):
         result = {}
-        for line, row in enumerate(csv_reader):
-            line += 1
+        for idx,img_file in enumerate(img_list):
+
+            img_fname = self.img_dir + img_file
+            annotations_fname = img_fname[:-3]+'json'
+
+            if img_fname not in result:
+                result[img_fname] = []
 
             try:
-                img_file, x1, y1, x2, y2, class_name = row[:6]
-            except ValueError:
-                raise_from(ValueError('line {}: format should be \'img_file,x1,y1,x2,y2,class_name\' or \'img_file,,,,,\''.format(line)), None)
-
-            img_file = self.img_dir+img_file
-
-            if img_file not in result:
-                result[img_file] = []
-
-            # If a row contains only an image path, it's an image without annotations.
-            if (x1, y1, x2, y2, class_name) == ('', '', '', '', ''):
+                with open(annotations_fname) as f:
+                    annotations = json.load(f)
+                #img_file, x1, y1, x2, y2, class_name = row[:6]
+            except:
                 continue
 
-            x1 = self._parse(x1, int, 'line {}: malformed x1: {{}}'.format(line))
-            y1 = self._parse(y1, int, 'line {}: malformed y1: {{}}'.format(line))
-            x2 = self._parse(x2, int, 'line {}: malformed x2: {{}}'.format(line))
-            y2 = self._parse(y2, int, 'line {}: malformed y2: {{}}'.format(line))
+            bboxes = annotations['bboxes']
+            print(bboxes)
+            if len(bboxes)==0:
+                continue
+            
+            for i,bbox in enumerate(bboxes):
+                x1, y1, x2, y2, class_name= bbox[0],bbox[1],bbox[2],bbox[3],annotations['class_name'][i]
 
-            # Check that the bounding box is valid.
-            if x2 <= x1:
-                raise ValueError('line {}: x2 ({}) must be higher than x1 ({})'.format(line, x2, x1))
-            if y2 <= y1:
-                raise ValueError('line {}: y2 ({}) must be higher than y1 ({})'.format(line, y2, y1))
+                # x1 = self._parse(x1, int, 'line {}: malformed x1: {{}}'.format(line))
+                # y1 = self._parse(y1, int, 'line {}: malformed y1: {{}}'.format(line))
+                # x2 = self._parse(x2, int, 'line {}: malformed x2: {{}}'.format(line))
+                # y2 = self._parse(y2, int, 'line {}: malformed y2: {{}}'.format(line))
 
-            # check if the current class name is correctly present
-            if class_name not in classes:
-                raise ValueError('line {}: unknown class name: \'{}\' (classes: {})'.format(line, class_name, classes))
+                # Check that the bounding box is valid.
+                if x2 <= x1:
+                    raise ValueError('bbox {}: x2 ({}) must be higher than x1 ({})'.format(i, x2, x1))
+                if y2 <= y1:
+                    raise ValueError('bbox {}: y2 ({}) must be higher than y1 ({})'.format(i, y2, y1))
 
-            result[img_file].append({'x1': x1, 'x2': x2, 'y1': y1, 'y2': y2, 'class': class_name})
+                # check if the current class name is correctly present
+                if class_name not in classes:
+                    raise ValueError('bbox {}: unknown class name: \'{}\' (classes: {})'.format(i, class_name, classes))
+
+                result[img_fname].append({'x1': x1, 'x2': x2, 'y1': y1, 'y2': y2, 'class': class_name})
         return result
 
     def name_to_label(self, name):
@@ -482,7 +491,6 @@ class CustomDataset(Dataset):
     def image_aspect_ratio(self, image_index):
         image = Image.open(self.image_names[image_index])
         return float(image.width) / float(image.height)
-
 
 
 def collater(data):
