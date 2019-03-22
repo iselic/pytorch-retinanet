@@ -305,7 +305,6 @@ class CSVDataset(Dataset):
 
 
 class CustomDataset(Dataset):
-
     """Img folder with .json for each img"""
 
     def __init__(self, img_list,class_list, transform=None):
