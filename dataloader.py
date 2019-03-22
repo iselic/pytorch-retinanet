@@ -303,9 +303,10 @@ class CSVDataset(Dataset):
         image = Image.open(self.image_names[image_index])
         return float(image.width) / float(image.height)
 
+
 class CustomDataset(Dataset):
 
-  """Img folder with .json for each img"""
+    """Img folder with .json for each img"""
 
     def __init__(self, img_list,class_list, transform=None):
         """
@@ -457,7 +458,7 @@ class CustomDataset(Dataset):
             print(bboxes)
             if len(bboxes)==0:
                 continue
-            
+
             for i,bbox in enumerate(bboxes):
                 x1, y1, x2, y2, class_name= bbox[0],bbox[1],bbox[2],bbox[3],annotations['class_name'][i]
 
