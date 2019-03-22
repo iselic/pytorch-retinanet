@@ -448,7 +448,6 @@ class CustomDataset(Dataset):
                 continue
 
             bboxes = annotations['bboxes']
-            print(bboxes)
             if len(bboxes)==0:
                 continue
 

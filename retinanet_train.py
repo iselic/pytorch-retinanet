@@ -47,9 +47,8 @@ def train(img_dir,classes_csv,model_fname=None,resnet_depth=50,epochs=1000,steps
     for file in os.listdir(img_dir):
         if file.endswith(".png"):
             img_list.append(img_dir+file)
-    print(img_list)
-    randomised_list = random.sample(img_list,len(img_list))
-    print(randomised_list)
+
+    randomised_list = random.sample(img_list, len(img_list))
     num_train = int(0.8*len(img_list))
     train_imgs, val_imgs = randomised_list[:num_train], randomised_list[num_train:]
 
@@ -125,7 +124,7 @@ def train(img_dir,classes_csv,model_fname=None,resnet_depth=50,epochs=1000,steps
                 print(e)
                 continue
         print('Epoch: {} | Running loss: {:1.5f} | Elapsed Time: {}'.format(epoch_num, np.mean(loss_hist),
-                                                                            time.clock() - start_time))
+                                                                            (time.clock() - start_time)/60)
         mAP = csv_eval.evaluate(dataset_val, retinanet)
         scheduler.step(np.mean(epoch_loss))
 
@@ -137,7 +136,7 @@ def train(img_dir,classes_csv,model_fname=None,resnet_depth=50,epochs=1000,steps
     torch.save(retinanet.state_dict(), out_dir + '{}state_final_.pt'.format(out_prefix))
 
 
-def infer(img_dir,classes_csv,model_fname,resnet_depth,out_dir, results_fname):
+def infer(img_dir,classes_csv,model_fname,resnet_depth,score_thresh,out_dir, results_fname):
 
     # Create dataset
     img_list = []
