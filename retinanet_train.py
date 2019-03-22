@@ -123,8 +123,7 @@ def train(img_dir,classes_csv,model_fname=None,resnet_depth=50,epochs=1000,steps
             except Exception as e:
                 print(e)
                 continue
-        print('Epoch: {} | Running loss: {:1.5f} | Elapsed Time: {}'.format(epoch_num, np.mean(loss_hist),
-                                                                            (time.clock() - start_time)/60)
+        print('Epoch: {} | Running loss: {:1.5f} | Elapsed Time: {}'.format(epoch_num, np.mean(loss_hist),(time.clock() - start_time)/60))
         mAP = csv_eval.evaluate(dataset_val, retinanet)
         scheduler.step(np.mean(epoch_loss))
 
