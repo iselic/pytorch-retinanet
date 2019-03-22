@@ -53,8 +53,8 @@ def train(img_dir,classes_csv,model_fname=None,resnet_depth=50,epochs=1000,steps
     num_train = int(0.8*len(img_list))
     train_imgs, val_imgs = randomised_list[:num_train], randomised_list[num_train:]
 
-    dataset_train = CSVDataset(img_list=train_imgs, class_list=classes_csv, transform=transforms.Compose([Normalizer(), Augmenter(), Resizer()]))
-    dataset_val = CSVDataset(img_list=val_imgs, class_list=classes_csv,transform=transforms.Compose([Normalizer(), Resizer()]))
+    dataset_train = CustomDataset(img_list=train_imgs, class_list=classes_csv, transform=transforms.Compose([Normalizer(), Augmenter(), Resizer()]))
+    dataset_val = CustomDataset(img_list=val_imgs, class_list=classes_csv,transform=transforms.Compose([Normalizer(), Resizer()]))
     sampler = AspectRatioBasedSampler(dataset_train, batch_size=2, drop_last=False)
     dataloader_train = DataLoader(dataset_train, num_workers=3, collate_fn=collater, batch_sampler=sampler)
 
