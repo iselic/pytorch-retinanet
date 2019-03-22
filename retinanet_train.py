@@ -47,8 +47,9 @@ def train(img_dir,classes_csv,model_fname=None,resnet_depth=50,epochs=1000,steps
     for file in os.listdir(img_dir):
         if file.endswith(".png"):
             img_list.append(file)
-
+    print(img_list)
     randomised_list = random.shuffle(img_list)
+    print(randomised_list)
     num_train = int(0.8*len(img_list))
     train_imgs, val_imgs = randomised_list[:num_train], randomised_list[num_train:]
 
