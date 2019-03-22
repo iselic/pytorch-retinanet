@@ -46,7 +46,7 @@ def train(img_dir,classes_csv,model_fname=None,resnet_depth=50,epochs=1000,steps
     img_list = []
     for file in os.listdir(img_dir):
         if file.endswith(".png"):
-            img_list.append(file)
+            img_list.append(img_dir+file)
     print(img_list)
     randomised_list = random.sample(img_list,len(img_list))
     print(randomised_list)
@@ -143,7 +143,7 @@ def infer(img_dir,classes_csv,model_fname,resnet_depth,out_dir, results_fname):
     img_list = []
     for file in os.listdir(img_dir):
         if file.endswith(".png"):
-            img_list.append(file)
+            img_list.append(img_dir+file)
 
     dataset_val = CustomDataset(img_list=img_list, class_list=classes_csv, transform=transforms.Compose([Normalizer(), Resizer()]))
     sampler_val = AspectRatioBasedSampler(dataset_val, batch_size=1, drop_last=False)
