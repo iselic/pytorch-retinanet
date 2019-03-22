@@ -316,7 +316,7 @@ class CustomDataset(Dataset):
         """
         self.class_list = class_list
         self.transform = transform
-        self.img_dir = img_dir
+        self.img_list = img_list
 
         # parse the provided class file
         try:
@@ -329,14 +329,8 @@ class CustomDataset(Dataset):
         for key, value in self.classes.items():
             self.labels[value] = key
 
-        # Get all image fnames in folder
-        img_list = []
-        for file in os.listdir(self.img_dir):
-            if file.endswith(".png"):
-                img_list.append(file)
-
         try:
-            self.image_data = self._read_annotations(img_list, self.classes)
+            self.image_data = self._read_annotations(self.img_list, self.classes)
         except ValueError as e:
             raise_from(ValueError('invalid CSV annotations file: {}: {}'.format(self.train_file, e)), None)
         self.image_names = list(self.image_data.keys())
@@ -438,9 +432,8 @@ class CustomDataset(Dataset):
 
     def _read_annotations(self, img_list, classes):
         result = {}
-        for idx,img_file in enumerate(img_list):
+        for idx,img_fname in enumerate(img_list):
 
-            img_fname = self.img_dir + img_file
             annotations_fname = img_fname[:-3]+'json'
 
             if img_fname not in result:
@@ -457,7 +450,7 @@ class CustomDataset(Dataset):
             print(bboxes)
             if len(bboxes)==0:
                 continue
-
+            
             for i,bbox in enumerate(bboxes):
                 x1, y1, x2, y2, class_name= bbox[0],bbox[1],bbox[2],bbox[3],annotations['class_name'][i]
 
