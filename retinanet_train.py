@@ -44,9 +44,12 @@ def train(img_dir,classes_csv,model_fname=None,resnet_depth=50,epochs=1000,steps
 
     # Get all image fnames in folder
     img_list = []
-    for file in os.listdir(img_dir):
-        if file.endswith(".png"):
-            img_list.append(img_dir+file)
+    if not isinstance(img_dir, list):
+        img_dir = [img_dir]
+    for dir in img_dir:
+        for file in os.listdir(dir):
+            if file.endswith(".png"):
+                img_list.append(dir + file)
 
     randomised_list = random.sample(img_list, len(img_list))
     num_train = int(0.8*len(img_list))
@@ -139,9 +142,12 @@ def infer(img_dir,classes_csv,model_fname,resnet_depth,score_thresh,out_dir, res
 
     # Create dataset
     img_list = []
-    for file in os.listdir(img_dir):
-        if file.endswith(".png"):
-            img_list.append(img_dir+file)
+    if not isinstance(img_dir, list):
+        img_dir = [img_dir]
+    for dir in img_dir:
+        for file in os.listdir(dir):
+            if file.endswith(".png"):
+                img_list.append(dir + file)
 
     dataset_val = CustomDataset(img_list=img_list, class_list=classes_csv, transform=transforms.Compose([Normalizer(), Resizer()]))
     sampler_val = AspectRatioBasedSampler(dataset_val, batch_size=1, drop_last=False)
