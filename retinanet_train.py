@@ -226,6 +226,6 @@ def infer(img_dir,classes_csv,model_fname,resnet_depth,score_thresh,out_dir, res
     #         fig, ax = plt.subplots(figsize=(12, 12))
     #         ax.imshow(img, interpolation='bilinear')
 
-    with open(out_dir+results_fname,"wb") as output_file:
+    with open(out_dir+results_fname+'.pickle',"wb") as output_file:
         pickle.dump(results, output_file)
 
